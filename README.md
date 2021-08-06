@@ -24,3 +24,38 @@ import "github.com/dakimura/gomodmrcli"
 ```
 
 ## Quick Start
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/dakimura/gomodmrcli"
+)
+
+func main() {
+	defaultHttpClient := new(http.Client)
+	// --- e.g. get dependencies of the module
+	modulePath := "google.golang.org/protobuf"
+	moduleVersion := "v1.26.0"
+	proxyCli := gomodmrcli.NewProxyClient(defaultHttpClient)
+	mf, _ := proxyCli.Mod(modulePath, moduleVersion, false)
+
+	fmt.Printf("%s@%s is depending on:\n", modulePath, moduleVersion)
+	for _, req := range mf.Require {
+		fmt.Println(req.Syntax.Token[0])
+	}
+
+	// --- e.g. get modules recently synchronized to the official go mod proxy
+	indexCli := gomodmrcli.NewIndexClient(defaultHttpClient)
+	indices, _ := indexCli.Index(time.Now().Add(-24*time.Hour), 5, false)
+
+	fmt.Println()
+	fmt.Println("Recently updated modules are:")
+	for _, index := range indices {
+		fmt.Println(index.Path)
+	}
+}
+```
