@@ -27,6 +27,7 @@ type Index struct {
 }
 
 func (c *IndexClient) Index(since time.Time, limit int, disableModuleFetch bool) ([]Index, error) {
+	const layout="2006-01-02T15:04:05Z"
 	if limit < 0 || limit > 2000 {
 		return nil, errors.New("limit must be between 0 and 2000")
 	}
@@ -35,7 +36,7 @@ func (c *IndexClient) Index(since time.Time, limit int, disableModuleFetch bool)
 	url := "https://index.golang.org/index?"
 	var queries []string
 	if !since.IsZero() {
-		queries = append(queries, fmt.Sprintf("since=%s", since.Format(time.RFC3339)))
+		queries = append(queries, fmt.Sprintf("since=%s", since.Format(layout)))
 	}
 	if limit != 0 {
 		queries = append(queries, fmt.Sprintf("limit=%d", limit))
